@@ -3,7 +3,7 @@
 The library encodes [ICD9
 codes](https://en.wikipedia.org/wiki/International_Statistical_Classification_of_Diseases_and_Related_Health_Problems#ICD-9)
 in their natural hierarchy.  For example, Cholera due to vibrio cholerae has
-the ICD9 code `0010`, and are categorized as as type of Cholera, which in turn
+the ICD9 code `001.0`, and is categorized as a type of Cholera, which in turn
 is a type of Intestinal Infectious Disease.  Specifically, `001.0` has the
 following hierarchy:
 
@@ -12,9 +12,12 @@ following hierarchy:
         001     Cholera
           001.0 Cholera due to vibrio cholerae
 
-This library encodes all ICD9 codes into a tree that captures this
-relationship.  It also includes a code descriptions file that can also be
-imported to provide english descriptions for each code.
+Assuming that codes closely related in the tree are more related than with
+codes further in the tree, this hierarchy is a way to cluster related codes.
+
+This library encodes all ICD9 codes into a tree that captures these
+relationships.   It also includes a icd9 descriptions file that can also be
+imported to provide short english descriptions for each code.
 
 
 ## Using the library
