@@ -53,21 +53,21 @@ class Node(object):
   def leaves(self):
     leaves = set()
     if not self.children:
-      return set([self])
+      return [self]
     for child in self.children:
       leaves.update(child.leaves)
-    return leaves
+    return list(leaves)
 
+  # return all leaf notes with a depth of @depth
   def leaves_at_depth(self, depth):
     return filter(lambda n: n.depth == depth, self.leaves)
-
 
   @property
   def siblings(self):
     parent = self.parent
     if not parent:
-      return set()
-    return set(parent.children)
+      return []
+    return list(parent.children)
 
   def __str__(self):
     return '%s\t%s' % (self.depth, self.code)
