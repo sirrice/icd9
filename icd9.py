@@ -1,3 +1,4 @@
+import csv
 import json
 from collections import *
 
@@ -22,6 +23,19 @@ class Node(object):
     return None
 
   @property
+  def root(self):
+    return self.parents[0]
+
+  @property
+  def description(self):
+    print self.code
+    return self.root.code2descr.get(self.code, self.code)
+
+  @property
+  def descr(self):
+    return self.description
+
+  @property
   def codes(self):
     return map(lambda n: n.code, self.leaves)
 
@@ -32,7 +46,8 @@ class Node(object):
     while n:
       ret.append(n)
       n = n.parent
-    return reversed(ret)
+    ret.reverse()
+    return ret
 
 
   @property
@@ -63,14 +78,26 @@ class Node(object):
 
 
 class ICD9(Node):
-  def __init__(self, codesfname):
+  def __init__(self, codesfname, descfname=None):
     # dictionary of depth -> dictionary of code->node
     self.depth2nodes = defaultdict(dict)
+    self.code2descr = {}
     super(ICD9, self).__init__(-1, 'ROOT')
 
     with file(codesfname, 'r') as f:
       allcodes = json.loads(f.read())
       self.process(allcodes)
+
+    try:
+      with file(descfname, 'r') as f:
+        r = csv.reader(f)
+        r.next()
+        for line in r:
+          if len(line) >= 2:
+            self.code2descr[line[0]] = line[1]
+    except Exception as e:
+      print e
+      pass
 
   def process(self, allcodes):
     for hierarchy in allcodes:
@@ -94,7 +121,7 @@ class ICD9(Node):
 
 
 if __name__ == '__main__':
-  tree = ICD9('codes.json')
+  tree = ICD9('codes.json', 'descriptions.csv')
   counter = Counter(map(str, tree.leaves))
   import pdb
   pdb.set_trace()

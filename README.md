@@ -11,17 +11,19 @@ Specifically, `001.0` has the following hierarchy:
           001.0 Cholera due to vibrio cholerae
 
 This library encodes all ICD9 codes into a tree that captures this
-relationship.  This tree only contains codes, and not the description text.
+relationship.  It also includes a code descriptions file that can also be
+imported to provide english descriptions for each code.
 
 
 ## Using the library
 
-Include `icd9.py` in your python path, and put `codes.json` somewhere convenient.   Here's a simple example:
+Include `icd9.py` in your python path.  Then put `codes.json` and `descriptions.csv` somewhere convenient.
+Here's a simple example:
 
     from icd9 import ICD9
 
     # feel free to replace with your path to the json file
-    tree = ICD9('codes.json')
+    tree = ICD9('codes.json', 'descriptions.csv')
 
     # list of top level codes (e.g., '001-139', ...)
     toplevelnodes = tree.children
@@ -42,6 +44,25 @@ The hierarchy is encoded in a tree of `Node` objects.  `Node` has the following 
     tree.find('001.0')
 
 And the following properties:
+
+`code`
+
+    # get node's ICD9 code
+    tree.find('001.1').code
+
+`description`: if you also passed it `descriptions.csv` in the constructor.  Otherwise it returns the code.
+
+    # get english description of ICD9 code
+    # prints: 'Cholera due to vibrio cholerae el tor'
+    tree.find('001.1').description
+
+    # prints: 'ROOT'
+    tree.description
+
+    # prints: '001'
+    tree.find('001.1').parent.description
+
+`descr`: alias for `description`
 
 `children`
 
@@ -74,16 +95,11 @@ And the following properties:
 
 ## ICD9 Descriptions
 
-`descriptions.txt` contains a fixed width file of all ICD9 codes and their short and long descriptions.
-This file can be used in conjuction with this library to look up descriptions of each code.
+`descriptions.txt` contains a csv file of ICD9 codes and their long and short descriptions.
+This file can be used in this library to provide text descriptions for each ICD9 code.
 
-**NOTE**: The hierarchy uses codes that contain a period (`.`).  This
-description file doesn't include the periods.  This must be taken into account
-when using this file as a lookup table.
-
-Alternatively, you can use
-[drobhbins's](https://raw.github.com/drobbins/ICD9/master/output/output.txt)
-csv file of ICD9 descriptions.
+You can thank [drobhbins](https://github.com/drobbins/ICD9) who actually
+created the file.  I just stole it.
 
 ## Scraper
 
