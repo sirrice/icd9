@@ -1,9 +1,11 @@
 # Python library for ICD9 Codes
 
-The library encodes ICD9 codes in their natural hierarchy.  For example,
-Cholera due to vibrio cholerae has the ICD9 code `0010`, and are categorized as
-as type of Cholera, which in turn is a type of Intestinal Infectious Disease.
-Specifically, `001.0` has the following hierarchy:
+The library encodes [ICD9
+codes](https://en.wikipedia.org/wiki/International_Statistical_Classification_of_Diseases_and_Related_Health_Problems#ICD-9)
+in their natural hierarchy.  For example, Cholera due to vibrio cholerae has
+the ICD9 code `0010`, and are categorized as as type of Cholera, which in turn
+is a type of Intestinal Infectious Disease.  Specifically, `001.0` has the
+following hierarchy:
 
     001-139     Infectious and Parasitic Diseases
       001-009   Intestinal Infectious Diseases
