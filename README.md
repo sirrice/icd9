@@ -16,10 +16,11 @@ relationship.  This tree only contains codes, and not the description text.
 
 ## Using the library
 
-Include `icd9.py` in your python path.  The following is an example:
+Include `icd9.py` in your python path, and put `codes.json` somewhere convenient.   Here's a simple example:
 
     from icd9 import ICD9
 
+    # feel free to replace with your path to the json file
     tree = ICD9('codes.json')
 
     # list of top level codes (e.g., '001-139', ...)
