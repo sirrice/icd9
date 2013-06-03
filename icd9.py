@@ -28,7 +28,6 @@ class Node(object):
 
   @property
   def description(self):
-    print self.code
     return self.root.code2descr.get(self.code, self.code)
 
   @property
@@ -106,8 +105,6 @@ class ICD9(Node):
   def get_node(self, depth, code):
     d = self.depth2nodes[depth]
     if code not in d:
-      if depth == 0:
-        print "%s\t%s" % (depth, code)
       d[code] = Node(depth, code)
     return d[code]
 
