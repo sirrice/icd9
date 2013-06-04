@@ -2,7 +2,9 @@
 
 The library encodes [ICD9
 codes](https://en.wikipedia.org/wiki/International_Statistical_Classification_of_Diseases_and_Related_Health_Problems#ICD-9)
-in their natural hierarchy.  For example, "Cholera due to vibrio cholerae" has
+in their natural hierarchy.  
+
+For example, "Cholera due to vibrio cholerae" has
 the ICD9 code `001.0`, and is categorized as a type of Cholera, which in turn
 is a type of Intestinal Infectious Disease.  Specifically, `001.0` has the
 following hierarchy:
