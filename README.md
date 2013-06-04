@@ -38,16 +38,17 @@ print '\t'.join(toplevelcodes)
 ```
 
 
-The hierarchy is encoded in a tree of `Node` objects.  `Node` has the following methods:
+The hierarchy is encoded in a tree of `Node` objects.  The `ICD9()` constructor
+returns the root `Node`.  `Node` has the following methods:
 
-`search(code)`
+`node.search(code)`
 
 ```python
 # find all sub-nodes whose codes contain '001'
 tree.search('001')
 ```
 
-`find(code)`
+`node.find(code)`
 
 ```python
 # find sub-node with code '001.0'. Returns None if code is not found
@@ -56,7 +57,7 @@ tree.find('001.0')
 
 And the following properties:
 
-`code`
+`node.code`
 
 ```python
 # get node's ICD9 code
@@ -69,7 +70,7 @@ tree.find('001.1').parent.code
 tree.find('001').code
 ```
 
-`description`:
+`node.description`:
 
 ```python
 # get english description of ICD9 code
@@ -86,9 +87,9 @@ tree.find('001.1').parent.description
 tree.find('001').description
 ```
 
-`descr`: alias for `description`
+`node.descr`: alias for `description`
 
-`children`
+`node.children`
 
 ```python
 # get node's children
@@ -98,28 +99,28 @@ tree.children
 tree.children[0].search('001.0')
 ```
 
-`parent`
+`node.parent`
 
 ```python
 # get 001.0 node's parent.  None if node is a root
 tree.find('001.0').parent
 ```
 
-`parents`
+`node.parents`
 
 ```python
 # get 001.0 node's parent path from the root.  Root node is the first element
 tree.find('001.0').parents
 ```
 
-`leaves`
+`node.leaves`
 
 ```python
 # get all leaf nodes under root's first child
 tree.children[0].leaves
 ```
 
-`siblings`
+`node.siblings`
 
 ```python
 # get all of 001.0 node's siblings that share the same parent
