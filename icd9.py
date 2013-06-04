@@ -3,8 +3,9 @@ import json
 from collections import *
 
 class Node(object):
-  def __init__(self, depth, code):
+  def __init__(self, depth, code, descr=None):
     self.depth = depth
+    self.descr = descr or code
     self.code = code
     self.parent = None
     self.children = []
@@ -14,10 +15,14 @@ class Node(object):
       self.children.append(child)
 
   def search(self, code):
-    return filter(lambda n: code in n.code, self.leaves)
+    if code == self.code: return [self]
+    ret = []
+    for child in self.children:
+      ret.extend(child.search(code))
+    return ret
 
   def find(self, code):
-    nodes = filter(lambda n: n.code == code, self.leaves)
+    nodes = self.search(code)
     if nodes:
       return nodes[0]
     return None
@@ -28,11 +33,7 @@ class Node(object):
 
   @property
   def description(self):
-    return self.root.code2descr.get(self.code, self.code)
-
-  @property
-  def descr(self):
-    return self.description
+    return self.descr
 
   @property
   def codes(self):
@@ -77,48 +78,40 @@ class Node(object):
 
 
 class ICD9(Node):
-  def __init__(self, codesfname, descfname=None):
+  def __init__(self, codesfname):
     # dictionary of depth -> dictionary of code->node
     self.depth2nodes = defaultdict(dict)
-    self.code2descr = {}
     super(ICD9, self).__init__(-1, 'ROOT')
 
     with file(codesfname, 'r') as f:
       allcodes = json.loads(f.read())
       self.process(allcodes)
 
-    try:
-      with file(descfname, 'r') as f:
-        r = csv.reader(f)
-        r.next()
-        for line in r:
-          if len(line) >= 2:
-            self.code2descr[line[0]] = line[1]
-    except Exception as e:
-      print e
-      pass
-
   def process(self, allcodes):
     for hierarchy in allcodes:
       self.add(hierarchy)
 
-  def get_node(self, depth, code):
+  def get_node(self, depth, code, descr):
     d = self.depth2nodes[depth]
     if code not in d:
-      d[code] = Node(depth, code)
+      d[code] = Node(depth, code, descr)
     return d[code]
 
   def add(self, hierarchy):
     prev_node = self
-    for depth, code in enumerate(hierarchy):
-      node = self.get_node(depth, code)
+    for depth, link in enumerate(hierarchy):
+      if not link['code']: continue
+
+      code = link['code']
+      descr = 'descr' in link and link['descr'] or code
+      node = self.get_node(depth, code, descr)
       node.parent = prev_node
       prev_node.add_child(node)
       prev_node = node
 
 
 if __name__ == '__main__':
-  tree = ICD9('codes.json', 'descriptions.csv')
+  tree = ICD9('codes.json')
   counter = Counter(map(str, tree.leaves))
   import pdb
   pdb.set_trace()

@@ -2,7 +2,7 @@
 
 The library encodes [ICD9
 codes](https://en.wikipedia.org/wiki/International_Statistical_Classification_of_Diseases_and_Related_Health_Problems#ICD-9)
-in their natural hierarchy.  For example, Cholera due to vibrio cholerae has
+in their natural hierarchy.  For example, "Cholera due to vibrio cholerae" has
 the ICD9 code `001.0`, and is categorized as a type of Cholera, which in turn
 is a type of Intestinal Infectious Disease.  Specifically, `001.0` has the
 following hierarchy:
@@ -15,20 +15,19 @@ following hierarchy:
 Assuming that codes closely related in the tree are more related than with
 codes further in the tree, this hierarchy is a way to cluster related codes.
 
-This library encodes all ICD9 codes into a tree that captures these
-relationships.   It also includes a icd9 descriptions file that can also be
-imported to provide short english descriptions for each code.
+This library encodes all ICD9 codes and their descriptions into a tree that
+captures these relationships.
 
 
 ## Using the library
 
-Include `icd9.py` in your python path.  Then put `codes.json` and `descriptions.csv` somewhere convenient.
-Here's a simple example:
+Include `icd9.py` in your python path.  Then put `codes.json` somewhere
+convenient.  Here's a simple example:
 
     from icd9 import ICD9
 
     # feel free to replace with your path to the json file
-    tree = ICD9('codes.json', 'descriptions.csv')
+    tree = ICD9('codes.json')
 
     # list of top level codes (e.g., '001-139', ...)
     toplevelnodes = tree.children
@@ -55,7 +54,13 @@ And the following properties:
     # get node's ICD9 code
     tree.find('001.1').code
 
-`description`: if you also passed it `descriptions.csv` in the constructor.  Otherwise it returns the code.
+    # prints '001'
+    tree.find('001.1').parent.code
+
+    # prints '001'
+    tree.find('001').code
+
+`description`:
 
     # get english description of ICD9 code
     # prints: 'Cholera due to vibrio cholerae el tor'
@@ -64,8 +69,12 @@ And the following properties:
     # prints: 'ROOT'
     tree.description
 
-    # prints: '001'
+    # prints: 'Cholera'
     tree.find('001.1').parent.description
+
+    # also prints: 'Cholera'
+    tree.find('001').description
+
 
 `descr`: alias for `description`
 
@@ -100,19 +109,27 @@ And the following properties:
 
 ## ICD9 Descriptions
 
-`descriptions.txt` contains a csv file of ICD9 codes and their long and short descriptions.
-This file can be used in this library to provide text descriptions for each ICD9 code.
+This library includes descriptions of each ICD9 code and grouping name.
 
-You can thank [drobhbins](https://github.com/drobbins/ICD9) who actually
-created the file.  I just stole it.
+If you are interested in another list of ICD9 codes and their descriptions,
+[drobhbins](https://github.com/drobbins/ICD9) created a csv file of ICD9 codes
+and their short and long descriptions.
 
 ## Scraper
 
 The `scraper/` directory includes the scraper code used to generate the
-dataset.  `scraper/scraper.py` creates a json file `codes.json` of each ICD9 code's parent codes:
+dataset.  `scraper/scraper.py` creates a json file `codes.json` of each ICD9
+code's parent codes and descriptions:
 
-    [None, "001-139", "001-009", "001", "001.0"]
+    [
+      {'code': None},
+      {'code': '001-139', 'descr': 'Infectious and Parasitic Diseases'},
+      {'code': '001-009', 'descr': 'Intestinal Infectious Diseases'},
+      {'code': '001', 'descr': 'Cholera'},
+      {'code':  '001.0', 'descr': 'Cholera due to vibrio cholerae'}
+    ]
 
-The last element is the actual code, the preceeding elements are coarser groupings of codes
+The last element is the actual code, the preceeding elements are coarser
+groupings of codes.  The first element is a dummy that represents root.
 
 

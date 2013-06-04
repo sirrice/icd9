@@ -51,8 +51,7 @@ class Scraper(object):
         self.cache[url] = json.dumps(links)
 
 
-
-      for link in links:
+      for link in reversed(links):
         link['depth'] = depth+1
         path = link['href']
         newparents = list(parents)
@@ -61,6 +60,7 @@ class Scraper(object):
         if path:
           self.push(depth+1, newurl, newparents)
         else:
+          print link
           yield newparents
 
 
@@ -88,15 +88,16 @@ def startendExtractorFactory(regex):
     if not text:
       return {'code': None}
     match = matcher.search(text)
-    if match:
-      group = match.groups()
-      if len(group) == 1 or (len(group) >= 3 and not group[2]):
-        return { 'code': group[0] }
-      elif len(group) >= 3:
-        code = '%s-%s' % (group[0], group[2])
-        return { 'code': code }
-    print 'no codes from %s' % text
-    return { 'code': None }
+    if not match:
+      print 'no codes from %s' % text
+      return { 'code': None }
+
+    group = match.groupdict()
+    if group['end']:
+      code = '%s-%s' % (group['start'], group['end'])
+    else:
+      code = group['start']
+    return { 'code': code, 'descr': group['descr'] }
   return f
 
 
@@ -107,7 +108,10 @@ def singleExtractorFactory(regex):
       return {'code': None}
     match = matcher.search(text)
     if match:
-      return { 'code': match.groups()[0] }
+      group = match.groupdict()
+
+      if group['code']:
+        return dict(group)
 
     print 'no codes from %s' % text
     return { 'code': None}
@@ -115,23 +119,20 @@ def singleExtractorFactory(regex):
 
 
 if __name__ == '__main__':
-  l1links = levelFactory('.lvl1', 'div.chapter', startendExtractorFactory('\((\w?\d+)(-(\w?\d+)\))?'))
-  l2links = levelFactory('.lvl2', 'div.section', startendExtractorFactory('\((\w?\d+)(-(\w?\d+)\))?'))
-  l3links = levelFactory('.lvl3', 'div.dlvl', singleExtractorFactory('^\s*(\w?\d+)\s+'))
-  l4links = levelFactory('.lvl4', 'div.dlvl', singleExtractorFactory('^\s*(\w?\d+\.\d*)\s+'))
-  l5links = levelFactory('.lvl5', 'div.dlvl', singleExtractorFactory('^\s*(\w?\d+\.\d*)\s+'))
+  regex1 = '^(\d+\.\s*)?(?P<descr>[\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
+  regex2 = '^(?P<descr>[\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
+  regex3 = '^\s*(?P<code>\w?\d+(\.\d*)?)\s+(?P<descr>.*)'
+  l1links = levelFactory('.lvl1', 'div.chapter', startendExtractorFactory(regex1))
+  l2links = levelFactory('.lvl2', 'div.section', startendExtractorFactory(regex2))
+  l3links = levelFactory('.lvl3', 'div.dlvl', singleExtractorFactory(regex3))
+  l4links = levelFactory('.lvl4', 'div.dlvl', singleExtractorFactory(regex3))
+  l5links = levelFactory('.lvl5', 'div.dlvl', singleExtractorFactory(regex3))
   handlers = [l1links, l2links, l3links, l4links, l5links]
   scraper = Scraper(handlers)
   scraper.push(0, 'http://icd9cm.chrisendres.com/index.php?action=contents')
   hierarchies = scraper.run()
-  def getcode(link):
-    return link['code']
-  def maphier(hierarchy):
-    return map(getcode, hierarchy)
-
 
   with file('./codes.json','w') as f:
-
-    codes = map(maphier, hierarchies)
+    codes = [x for x in hierarchies]
     f.write(json.dumps(codes))
 
