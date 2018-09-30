@@ -1,4 +1,3 @@
-import bsddb3
 import json
 import re
 import requests
@@ -12,7 +11,7 @@ class Scraper(object):
     self.stack = deque()
     self.hostname = None
     self.handlers = handlers
-    self.cache = bsddb3.hashopen('./cache')
+    self.cache = {}
 
   def path(self, url):
     return '%s?%s' % (urlparse(url).path, urlparse(url).query)
@@ -49,7 +48,6 @@ class Scraper(object):
         handler = self.handlers[depth]
         links = handler(dom)
         self.cache[url] = json.dumps(links)
-
 
       for link in reversed(links):
         link['depth'] = depth+1
@@ -119,8 +117,8 @@ def singleExtractorFactory(regex):
 
 
 if __name__ == '__main__':
-  regex1 = '^(\d+\.\s*)?(?P<descr>[\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
-  regex2 = '^(?P<descr>[\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
+  regex1 = '^(\d+\.\s*)?(?P<descr>[\-\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
+  regex2 = '^(?P<descr>[\-\d\w\s\,\.]*)\s*\((?P<start>\w?\d+)(-(?P<end>\w?\d+)\))?'
   regex3 = '^\s*(?P<code>\w?\d+(\.\d*)?)\s+(?P<descr>.*)'
   l1links = levelFactory('.lvl1', 'div.chapter', startendExtractorFactory(regex1))
   l2links = levelFactory('.lvl2', 'div.section', startendExtractorFactory(regex2))
