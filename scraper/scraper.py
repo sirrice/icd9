@@ -47,6 +47,8 @@ class Scraper(object):
 
         handler = self.handlers[depth]
         links = handler(dom)
+        if len(links) == 0 and depth < len(self.handlers)-1:
+          links = self.handlers[depth+1](dom)
         self.cache[url] = json.dumps(links)
 
       for link in reversed(links):
